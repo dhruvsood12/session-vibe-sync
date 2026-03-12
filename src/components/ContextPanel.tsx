@@ -10,7 +10,7 @@ interface SegmentedControlProps<T extends string> {
   onChange: (value: T) => void;
 }
 
-const SegmentedControl = <T extends string>({ label, options, value, onChange }: SegmentedControlProps<T>) => {
+function SegmentedControl<T extends string>({ label, options, value, onChange }: SegmentedControlProps<T>) {
   return (
     <div className="space-y-2">
       <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{label}</label>
