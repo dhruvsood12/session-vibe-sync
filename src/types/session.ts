@@ -18,12 +18,20 @@ export interface FeatureWeight {
   direction: "positive" | "negative";
 }
 
+export interface ShapValue {
+  feature: string;
+  value: number;
+  contribution: number;
+}
+
 export interface SessionPrediction {
   sessionType: string;
   description: string;
   tracks: Track[];
   featureWeights: FeatureWeight[];
   modelConfidence: number;
+  candidatesGenerated?: number;
+  rankingModel?: string;
 }
 
 export type Mood = "energetic" | "chill" | "focused" | "melancholic";
