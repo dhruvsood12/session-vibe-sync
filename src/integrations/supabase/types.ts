@@ -14,6 +14,155 @@ export type Database = {
   }
   public: {
     Tables: {
+      catalog_artists: {
+        Row: {
+          created_at: string
+          followers: number | null
+          genres: string[] | null
+          id: string
+          image_url: string | null
+          name: string
+          popularity: number | null
+          spotify_artist_id: string | null
+          spotify_url: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          followers?: number | null
+          genres?: string[] | null
+          id?: string
+          image_url?: string | null
+          name: string
+          popularity?: number | null
+          spotify_artist_id?: string | null
+          spotify_url?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          followers?: number | null
+          genres?: string[] | null
+          id?: string
+          image_url?: string | null
+          name?: string
+          popularity?: number | null
+          spotify_artist_id?: string | null
+          spotify_url?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      catalog_tracks: {
+        Row: {
+          acousticness: number | null
+          album_image_url: string | null
+          album_name: string | null
+          artist_id: string | null
+          artist_name: string
+          bpm: number | null
+          created_at: string
+          danceability: number | null
+          duration_ms: number | null
+          energy: number | null
+          enriched: boolean
+          enriched_at: string | null
+          explicit: boolean | null
+          genre_tags: string[] | null
+          id: string
+          instrumentalness: number | null
+          isrc: string | null
+          key: number | null
+          liveness: number | null
+          loudness: number | null
+          mode: number | null
+          popularity: number | null
+          preview_url: string | null
+          source: string
+          speechiness: number | null
+          spotify_track_id: string | null
+          spotify_url: string | null
+          time_signature: number | null
+          title: string
+          updated_at: string
+          valence: number | null
+        }
+        Insert: {
+          acousticness?: number | null
+          album_image_url?: string | null
+          album_name?: string | null
+          artist_id?: string | null
+          artist_name: string
+          bpm?: number | null
+          created_at?: string
+          danceability?: number | null
+          duration_ms?: number | null
+          energy?: number | null
+          enriched?: boolean
+          enriched_at?: string | null
+          explicit?: boolean | null
+          genre_tags?: string[] | null
+          id?: string
+          instrumentalness?: number | null
+          isrc?: string | null
+          key?: number | null
+          liveness?: number | null
+          loudness?: number | null
+          mode?: number | null
+          popularity?: number | null
+          preview_url?: string | null
+          source?: string
+          speechiness?: number | null
+          spotify_track_id?: string | null
+          spotify_url?: string | null
+          time_signature?: number | null
+          title: string
+          updated_at?: string
+          valence?: number | null
+        }
+        Update: {
+          acousticness?: number | null
+          album_image_url?: string | null
+          album_name?: string | null
+          artist_id?: string | null
+          artist_name?: string
+          bpm?: number | null
+          created_at?: string
+          danceability?: number | null
+          duration_ms?: number | null
+          energy?: number | null
+          enriched?: boolean
+          enriched_at?: string | null
+          explicit?: boolean | null
+          genre_tags?: string[] | null
+          id?: string
+          instrumentalness?: number | null
+          isrc?: string | null
+          key?: number | null
+          liveness?: number | null
+          loudness?: number | null
+          mode?: number | null
+          popularity?: number | null
+          preview_url?: string | null
+          source?: string
+          speechiness?: number | null
+          spotify_track_id?: string | null
+          spotify_url?: string | null
+          time_signature?: number | null
+          title?: string
+          updated_at?: string
+          valence?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "catalog_tracks_artist_id_fkey"
+            columns: ["artist_id"]
+            isOneToOne: false
+            referencedRelation: "catalog_artists"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       exported_playlists: {
         Row: {
           created_at: string
@@ -57,6 +206,45 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      imported_playlists: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          image_url: string | null
+          import_status: string
+          imported_at: string | null
+          name: string
+          spotify_playlist_id: string | null
+          track_count: number | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          import_status?: string
+          imported_at?: string | null
+          name: string
+          spotify_playlist_id?: string | null
+          track_count?: number | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          import_status?: string
+          imported_at?: string | null
+          name?: string
+          spotify_playlist_id?: string | null
+          track_count?: number | null
+          user_id?: string
+        }
+        Relationships: []
       }
       profiles: {
         Row: {
@@ -145,6 +333,66 @@ export type Database = {
         }
         Relationships: []
       }
+      recommendation_logs: {
+        Row: {
+          context_activity: string | null
+          context_energy: string | null
+          context_mood: string | null
+          created_at: string
+          feedback: string | null
+          id: string
+          match_score: number | null
+          rank_position: number | null
+          ranking_model: string | null
+          session_id: string | null
+          track_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          context_activity?: string | null
+          context_energy?: string | null
+          context_mood?: string | null
+          created_at?: string
+          feedback?: string | null
+          id?: string
+          match_score?: number | null
+          rank_position?: number | null
+          ranking_model?: string | null
+          session_id?: string | null
+          track_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          context_activity?: string | null
+          context_energy?: string | null
+          context_mood?: string | null
+          created_at?: string
+          feedback?: string | null
+          id?: string
+          match_score?: number | null
+          rank_position?: number | null
+          ranking_model?: string | null
+          session_id?: string | null
+          track_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "recommendation_logs_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "saved_sessions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "recommendation_logs_track_id_fkey"
+            columns: ["track_id"]
+            isOneToOne: false
+            referencedRelation: "catalog_tracks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       saved_sessions: {
         Row: {
           activity: string
@@ -198,6 +446,38 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      user_saved_tracks: {
+        Row: {
+          added_at: string | null
+          id: string
+          source: string
+          track_id: string
+          user_id: string
+        }
+        Insert: {
+          added_at?: string | null
+          id?: string
+          source?: string
+          track_id: string
+          user_id: string
+        }
+        Update: {
+          added_at?: string | null
+          id?: string
+          source?: string
+          track_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_saved_tracks_track_id_fkey"
+            columns: ["track_id"]
+            isOneToOne: false
+            referencedRelation: "catalog_tracks"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {

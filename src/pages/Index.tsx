@@ -8,6 +8,7 @@ import { continuePlaylists } from "@/lib/continuation";
 import { useAuth } from "@/hooks/useAuth";
 import { useProfile } from "@/hooks/useProfile";
 import { useSavedSessions } from "@/hooks/useSavedSessions";
+import { useCatalogStatus } from "@/hooks/useCatalog";
 import ContextPanel from "@/components/ContextPanel";
 import InsightsPanel from "@/components/InsightsPanel";
 import TrackTable from "@/components/TrackTable";
@@ -20,6 +21,7 @@ const Index = () => {
   const { user, signOut } = useAuth();
   const { profile } = useProfile();
   const { saveSession } = useSavedSessions();
+  const { stats: catalogStats, seeding } = useCatalogStatus();
 
   const [context, setContext] = useState<SessionContext>({
     mood: "energetic",
@@ -93,9 +95,17 @@ const Index = () => {
         mode={mode}
         onModeChange={setMode}
         onNavigateHistory={() => navigate("/history")}
+        catalogStats={catalogStats}
       />
 
       <main className="flex-1 min-h-screen overflow-y-auto p-8">
+        {/* Seeding indicator */}
+        {seeding && (
+          <div className="mb-4 px-4 py-2 rounded-lg bg-accent/10 border border-accent/20 text-xs text-accent font-mono">
+            Initializing catalog...
+          </div>
+        )}
+
         {error ? (
           <div className="h-full flex items-center justify-center min-h-[60vh]">
             <div className="text-center space-y-2">

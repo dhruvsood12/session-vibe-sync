@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { Mood, Activity, TimeOfDay, EnergyLevel, SessionContext } from "@/types/session";
-import { Zap, User as UserIcon, LogOut, LogIn, Clock, FlaskConical } from "lucide-react";
+import { Zap, User as UserIcon, LogOut, LogIn, Clock, FlaskConical, Database } from "lucide-react";
 import { User } from "@supabase/supabase-js";
 
 interface SegmentedControlProps<T extends string> {
@@ -54,6 +54,7 @@ interface ContextPanelProps {
   hasProfile: boolean;
   mode: "session" | "continuation";
   onModeChange: (mode: "session" | "continuation") => void;
+  catalogStats?: { totalTracks: number; enrichedTracks: number } | null;
 }
 
 const moodOptions: { value: Mood; label: string }[] = [
@@ -99,6 +100,7 @@ export default function ContextPanel({
   hasProfile,
   mode,
   onModeChange,
+  catalogStats,
 }: ContextPanelProps) {
   return (
     <aside className="w-80 shrink-0 h-screen overflow-y-auto bg-surface shadow-surface p-5 flex flex-col gap-6">
@@ -208,8 +210,17 @@ export default function ContextPanel({
         </motion.button>
       )}
 
-      <div className="text-[10px] text-muted-foreground/50 font-mono">
-        {mode === "continuation" ? "content-similarity-v1" : hasProfile ? "personalized · heuristic-v1" : "session-only · heuristic-v1"} · 48 tracks
+      {/* Catalog status */}
+      <div className="space-y-1">
+        {catalogStats && (
+          <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground/50 font-mono">
+            <Database className="w-3 h-3" />
+            <span>{catalogStats.totalTracks} tracks · {catalogStats.enrichedTracks} enriched</span>
+          </div>
+        )}
+        <div className="text-[10px] text-muted-foreground/50 font-mono">
+          {mode === "continuation" ? "content-similarity-v1" : hasProfile ? "personalized · heuristic-v1" : "session-only · heuristic-v1"} · curated catalog
+        </div>
       </div>
     </aside>
   );
