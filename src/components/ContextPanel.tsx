@@ -111,6 +111,9 @@ export default function ContextPanel({
           </div>
           {user ? (
             <div className="flex items-center gap-1">
+              <button onClick={onNavigateExperiments} className="p-1.5 rounded-md hover:bg-surface-hover transition-colors" title="ML Experiments">
+                <FlaskConical className="w-3.5 h-3.5 text-muted-foreground" />
+              </button>
               <button onClick={onNavigateHistory} className="p-1.5 rounded-md hover:bg-surface-hover transition-colors" title="History">
                 <Clock className="w-3.5 h-3.5 text-muted-foreground" />
               </button>
