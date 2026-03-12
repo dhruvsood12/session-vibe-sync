@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { Mood, Activity, TimeOfDay, EnergyLevel, SessionContext } from "@/types/session";
-import { Zap, User as UserIcon, LogOut, LogIn } from "lucide-react";
+import { Zap, User as UserIcon, LogOut, LogIn, Clock } from "lucide-react";
 import { User } from "@supabase/supabase-js";
 
 interface SegmentedControlProps<T extends string> {
@@ -49,7 +49,10 @@ interface ContextPanelProps {
   onSignOut: () => void;
   onNavigateProfile: () => void;
   onNavigateAuth: () => void;
+  onNavigateHistory: () => void;
   hasProfile: boolean;
+  mode: "session" | "continuation";
+  onModeChange: (mode: "session" | "continuation") => void;
 }
 
 const moodOptions: { value: Mood; label: string }[] = [
@@ -90,10 +93,14 @@ export default function ContextPanel({
   onSignOut,
   onNavigateProfile,
   onNavigateAuth,
+  onNavigateHistory,
   hasProfile,
+  mode,
+  onModeChange,
 }: ContextPanelProps) {
   return (
     <aside className="w-80 shrink-0 h-screen overflow-y-auto bg-surface shadow-surface p-5 flex flex-col gap-6">
+      {/* Header */}
       <div className="space-y-1">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -102,26 +109,18 @@ export default function ContextPanel({
           </div>
           {user ? (
             <div className="flex items-center gap-1">
-              <button
-                onClick={onNavigateProfile}
-                className="p-1.5 rounded-md hover:bg-surface-hover transition-colors"
-                title="Taste Profile"
-              >
+              <button onClick={onNavigateHistory} className="p-1.5 rounded-md hover:bg-surface-hover transition-colors" title="History">
+                <Clock className="w-3.5 h-3.5 text-muted-foreground" />
+              </button>
+              <button onClick={onNavigateProfile} className="p-1.5 rounded-md hover:bg-surface-hover transition-colors" title="Taste Profile">
                 <UserIcon className="w-3.5 h-3.5 text-muted-foreground" />
               </button>
-              <button
-                onClick={onSignOut}
-                className="p-1.5 rounded-md hover:bg-surface-hover transition-colors"
-                title="Sign out"
-              >
+              <button onClick={onSignOut} className="p-1.5 rounded-md hover:bg-surface-hover transition-colors" title="Sign out">
                 <LogOut className="w-3.5 h-3.5 text-muted-foreground" />
               </button>
             </div>
           ) : (
-            <button
-              onClick={onNavigateAuth}
-              className="flex items-center gap-1.5 px-2.5 py-1 rounded-md hover:bg-surface-hover transition-colors"
-            >
+            <button onClick={onNavigateAuth} className="flex items-center gap-1.5 px-2.5 py-1 rounded-md hover:bg-surface-hover transition-colors">
               <LogIn className="w-3.5 h-3.5 text-muted-foreground" />
               <span className="text-xs text-muted-foreground">Sign in</span>
             </button>
@@ -130,6 +129,7 @@ export default function ContextPanel({
         <p className="text-xs text-muted-foreground">Context-aware music recommendation</p>
       </div>
 
+      {/* Profile nudge */}
       {user && !hasProfile && (
         <button
           onClick={onNavigateProfile}
@@ -141,46 +141,70 @@ export default function ContextPanel({
 
       <div className="h-px bg-border" />
 
-      <div className="space-y-5 flex-1">
-        <SegmentedControl
-          label="Activity"
-          options={activityOptions}
-          value={context.activity}
-          onChange={(v) => onContextChange({ ...context, activity: v })}
-        />
-        <SegmentedControl
-          label="Mood"
-          options={moodOptions}
-          value={context.mood}
-          onChange={(v) => onContextChange({ ...context, mood: v })}
-        />
-        <SegmentedControl
-          label="Time of Day"
-          options={timeOptions}
-          value={context.timeOfDay}
-          onChange={(v) => onContextChange({ ...context, timeOfDay: v })}
-        />
-        <SegmentedControl
-          label="Energy Level"
-          options={energyOptions}
-          value={context.energyLevel}
-          onChange={(v) => onContextChange({ ...context, energyLevel: v })}
-        />
-      </div>
+      {/* Mode selector */}
+      <SegmentedControl
+        label="Mode"
+        options={[
+          { value: "session" as const, label: "Session" },
+          { value: "continuation" as const, label: "Continue" },
+        ]}
+        value={mode}
+        onChange={(v) => onModeChange(v as "session" | "continuation")}
+      />
 
-      <motion.button
-        onClick={onGenerate}
-        disabled={isLoading}
-        className="w-full h-10 rounded-lg bg-foreground text-primary-foreground font-medium text-sm disabled:opacity-70 transition-opacity"
-        whileHover={{ scale: 1.01 }}
-        whileTap={{ scale: 0.98 }}
-        transition={{ type: "spring", stiffness: 400, damping: 30 }}
-      >
-        {isLoading ? "Ranking..." : "Generate Session"}
-      </motion.button>
+      {/* Session context controls */}
+      {mode === "session" && (
+        <div className="space-y-5 flex-1">
+          <SegmentedControl
+            label="Activity"
+            options={activityOptions}
+            value={context.activity}
+            onChange={(v) => onContextChange({ ...context, activity: v })}
+          />
+          <SegmentedControl
+            label="Mood"
+            options={moodOptions}
+            value={context.mood}
+            onChange={(v) => onContextChange({ ...context, mood: v })}
+          />
+          <SegmentedControl
+            label="Time of Day"
+            options={timeOptions}
+            value={context.timeOfDay}
+            onChange={(v) => onContextChange({ ...context, timeOfDay: v })}
+          />
+          <SegmentedControl
+            label="Energy Level"
+            options={energyOptions}
+            value={context.energyLevel}
+            onChange={(v) => onContextChange({ ...context, energyLevel: v })}
+          />
+        </div>
+      )}
+
+      {mode === "continuation" && (
+        <div className="flex-1 flex items-center">
+          <p className="text-xs text-muted-foreground">
+            Search for seed songs in the main panel. The system will find similar tracks using content-based similarity scoring.
+          </p>
+        </div>
+      )}
+
+      {mode === "session" && (
+        <motion.button
+          onClick={onGenerate}
+          disabled={isLoading}
+          className="w-full h-10 rounded-lg bg-foreground text-primary-foreground font-medium text-sm disabled:opacity-70 transition-opacity"
+          whileHover={{ scale: 1.01 }}
+          whileTap={{ scale: 0.98 }}
+          transition={{ type: "spring", stiffness: 400, damping: 30 }}
+        >
+          {isLoading ? "Ranking..." : "Generate Session"}
+        </motion.button>
+      )}
 
       <div className="text-[10px] text-muted-foreground/50 font-mono">
-        {hasProfile ? "personalized · heuristic-v1" : "session-only · heuristic-v1"} · {48} tracks
+        {mode === "continuation" ? "content-similarity-v1" : hasProfile ? "personalized · heuristic-v1" : "session-only · heuristic-v1"} · 48 tracks
       </div>
     </aside>
   );
