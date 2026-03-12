@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { Mood, Activity, TimeOfDay, EnergyLevel, SessionContext } from "@/types/session";
-import { Zap, User as UserIcon, LogOut, LogIn, Clock } from "lucide-react";
+import { Zap, User as UserIcon, LogOut, LogIn, Clock, FlaskConical } from "lucide-react";
 import { User } from "@supabase/supabase-js";
 
 interface SegmentedControlProps<T extends string> {
@@ -50,6 +50,7 @@ interface ContextPanelProps {
   onNavigateProfile: () => void;
   onNavigateAuth: () => void;
   onNavigateHistory: () => void;
+  onNavigateExperiments: () => void;
   hasProfile: boolean;
   mode: "session" | "continuation";
   onModeChange: (mode: "session" | "continuation") => void;
@@ -94,6 +95,7 @@ export default function ContextPanel({
   onNavigateProfile,
   onNavigateAuth,
   onNavigateHistory,
+  onNavigateExperiments,
   hasProfile,
   mode,
   onModeChange,
@@ -109,6 +111,9 @@ export default function ContextPanel({
           </div>
           {user ? (
             <div className="flex items-center gap-1">
+              <button onClick={onNavigateExperiments} className="p-1.5 rounded-md hover:bg-surface-hover transition-colors" title="ML Experiments">
+                <FlaskConical className="w-3.5 h-3.5 text-muted-foreground" />
+              </button>
               <button onClick={onNavigateHistory} className="p-1.5 rounded-md hover:bg-surface-hover transition-colors" title="History">
                 <Clock className="w-3.5 h-3.5 text-muted-foreground" />
               </button>

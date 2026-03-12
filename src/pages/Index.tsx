@@ -88,6 +88,7 @@ const Index = () => {
         onSignOut={signOut}
         onNavigateProfile={() => navigate("/profile")}
         onNavigateAuth={() => navigate("/auth")}
+        onNavigateExperiments={() => navigate("/experiments")}
         hasProfile={hasProfile}
         mode={mode}
         onModeChange={setMode}
