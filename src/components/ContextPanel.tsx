@@ -123,22 +123,11 @@ export default function ContextPanel({ context, onContextChange, onGenerate, isL
         whileTap={{ scale: 0.98 }}
         transition={{ type: "spring", stiffness: 400, damping: 30 }}
       >
-        {isLoading ? (
-          <span className="flex items-center justify-center gap-2">
-            <motion.span
-              className="w-3.5 h-3.5 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full inline-block"
-              animate={{ rotate: 360 }}
-              transition={{ duration: 0.8, repeat: Infinity, ease: "linear" }}
-            />
-            Generating...
-          </span>
-        ) : (
-          "Generate Session"
-        )}
+        {isLoading ? "Ranking..." : "Generate Session"}
       </motion.button>
 
       <div className="text-[10px] text-muted-foreground/50 font-mono">
-        LightGBM v4.1 · Spotify MPD · 1M playlists
+        heuristic-v1 · 48 tracks · genre-affinity retrieval
       </div>
     </aside>
   );

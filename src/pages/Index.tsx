@@ -1,10 +1,9 @@
-import { useState, useCallback, useEffect, useRef } from "react";
+import { useState, useCallback } from "react";
 import { SessionContext, SessionPrediction } from "@/types/session";
 import { getRecommendations } from "@/services/recommendationService";
 import ContextPanel from "@/components/ContextPanel";
 import InsightsPanel from "@/components/InsightsPanel";
 import TrackTable from "@/components/TrackTable";
-import LoadingOverlay from "@/components/LoadingOverlay";
 
 const Index = () => {
   const [context, setContext] = useState<SessionContext>({
@@ -16,42 +15,21 @@ const Index = () => {
 
   const [prediction, setPrediction] = useState<SessionPrediction | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [loadingStep, setLoadingStep] = useState(0);
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleGenerate = useCallback(() => {
+  const handleGenerate = useCallback(async () => {
     setIsLoading(true);
-    setLoadingStep(0);
-    setPrediction(null);
-
-    if (intervalRef.current) clearInterval(intervalRef.current);
-
-    let step = 0;
-    intervalRef.current = setInterval(() => {
-      step++;
-      if (step >= 4) {
-        if (intervalRef.current) clearInterval(intervalRef.current);
-        // Call the service layer instead of mock data directly
-        getRecommendations(context)
-          .then((result) => {
-            setPrediction(result);
-            setIsLoading(false);
-          })
-          .catch((err) => {
-            console.error("Prediction failed:", err);
-            setIsLoading(false);
-          });
-      } else {
-        setLoadingStep(step);
-      }
-    }, 600);
+    setError(null);
+    try {
+      const result = await getRecommendations(context);
+      setPrediction(result);
+    } catch (err) {
+      console.error("Prediction failed:", err);
+      setError(err instanceof Error ? err.message : "Prediction failed");
+    } finally {
+      setIsLoading(false);
+    }
   }, [context]);
-
-  useEffect(() => {
-    return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-    };
-  }, []);
 
   return (
     <div className="flex min-h-screen bg-background">
@@ -63,9 +41,14 @@ const Index = () => {
       />
 
       <main className="flex-1 min-h-screen overflow-y-auto p-8">
-        {isLoading ? (
+        {error ? (
           <div className="h-full flex items-center justify-center min-h-[60vh]">
-            <LoadingOverlay currentStep={loadingStep} />
+            <div className="text-center space-y-2">
+              <p className="text-sm text-destructive">{error}</p>
+              <button onClick={handleGenerate} className="text-xs text-muted-foreground underline">
+                Retry
+              </button>
+            </div>
           </div>
         ) : prediction ? (
           <div className="max-w-4xl mx-auto space-y-8">
@@ -74,6 +57,8 @@ const Index = () => {
               description={prediction.description}
               featureWeights={prediction.featureWeights}
               modelConfidence={prediction.modelConfidence}
+              candidatesGenerated={prediction.candidatesGenerated}
+              rankingModel={prediction.rankingModel}
             />
             <div className="h-px bg-border" />
             <TrackTable tracks={prediction.tracks} />
@@ -83,9 +68,7 @@ const Index = () => {
             <div className="text-center space-y-3">
               <p className="text-sm text-muted-foreground">Configure session context and generate recommendations.</p>
               <p className="text-xs font-mono text-muted-foreground/50">
-                {import.meta.env.VITE_USE_MOCK !== "false"
-                  ? "Mock mode · LightGBM ranking model · Spotify MPD features"
-                  : `Connected to ${import.meta.env.VITE_API_BASE_URL || "http://localhost:8000"}`}
+                Heuristic ranker · 48 tracks · genre-affinity retrieval
               </p>
             </div>
           </div>
