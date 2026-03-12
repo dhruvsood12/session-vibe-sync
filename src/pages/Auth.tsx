@@ -12,7 +12,7 @@ export default function Auth() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
-  const [confirmSent, setConfirmSent] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   if (loading) return null;
   if (user) return <Navigate to="/" replace />;
