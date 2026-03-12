@@ -163,7 +163,7 @@ const Index = () => {
             ) : mode === "session" ? (
               <div className="h-full flex items-center justify-center min-h-[60vh]">
                 <div className="text-center space-y-3">
-                  <p className="text-sm text-muted-foreground">Configure session context and generate recommendations.</p>
+                  <p className="text-sm text-muted-foreground">Set your session context to generate personalized recommendations.</p>
                   <p className="text-xs font-mono text-muted-foreground/50">
                     {hasProfile
                       ? "personalized · heuristic-v1 · profile + session scoring"
