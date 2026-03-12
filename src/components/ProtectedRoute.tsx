@@ -1,5 +1,6 @@
 import { Navigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
+import { isSupabaseConfigured } from "@/integrations/supabase/client";
 
 export default function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
@@ -13,6 +14,8 @@ export default function ProtectedRoute({ children }: { children: React.ReactNode
   }
 
   if (!user) {
+    // In demo mode we don't require auth.
+    if (!isSupabaseConfigured) return <Navigate to="/" replace />;
     return <Navigate to="/auth" replace />;
   }
 

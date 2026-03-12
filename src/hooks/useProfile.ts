@@ -6,6 +6,12 @@ import type { Tables, TablesUpdate } from "@/integrations/supabase/types";
 export type Profile = Tables<"profiles">;
 export type ProfileUpdate = TablesUpdate<"profiles">;
 
+function isNoRowFound(error: unknown): boolean {
+  if (!error || typeof error !== "object") return false;
+  const anyErr = error as any;
+  return anyErr.code === "PGRST116" || String(anyErr.message || "").toLowerCase().includes("0 rows");
+}
+
 export function useProfile() {
   const { user } = useAuth();
   const [profile, setProfile] = useState<Profile | null>(null);
@@ -32,8 +38,26 @@ export function useProfile() {
       .single();
 
     if (error) {
-      setError(error.message);
+      // First login can legitimately have no profile row yet.
+      if (isNoRowFound(error)) {
+        const created = await supabase
+          .from("profiles")
+          .insert({ user_id: user.id })
+          .select()
+          .single();
+        if (created.error) {
+          setError(created.error.message);
+          setProfile(null);
+        } else {
+          setError(null);
+          setProfile(created.data);
+        }
+      } else {
+        setError(error.message);
+        setProfile(null);
+      }
     } else {
+      setError(null);
       setProfile(data);
     }
     setLoading(false);
