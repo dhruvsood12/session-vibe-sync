@@ -31,7 +31,7 @@ export default function InsightsPanel({
           <p className="text-xs text-muted-foreground font-mono">{description}</p>
         </div>
         <div className="text-right space-y-0.5">
-          <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Avg Score</div>
+          <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Avg ranking score</div>
           <div className="text-sm font-mono text-accent tabular-nums">{modelConfidence.toFixed(3)}</div>
         </div>
       </div>
