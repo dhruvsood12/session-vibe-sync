@@ -1,12 +1,15 @@
 /**
  * Recommendation Service
- * 
- * Orchestrates predictions from either the mock engine or the real API.
- * Components call this service — never the mock data or API directly.
+ *
+ * Orchestrates predictions from either:
+ * - Local heuristic pipeline (default, honest about being heuristic)
+ * - Real FastAPI backend (when VITE_USE_MOCK=false)
+ *
+ * Components call this service — never the pipeline or API directly.
  */
 
 import { SessionContext, SessionPrediction } from "@/types/session";
-import { generatePrediction } from "@/data/mockData";
+import { runPipeline } from "@/lib/ranking";
 import { api, USE_MOCK, PredictRequest, PredictResponse } from "./api";
 
 function mapApiResponseToPrediction(res: PredictResponse): SessionPrediction {
@@ -44,9 +47,8 @@ function mapApiResponseToPrediction(res: PredictResponse): SessionPrediction {
 
 export async function getRecommendations(context: SessionContext): Promise<SessionPrediction> {
   if (USE_MOCK) {
-    // Simulate network latency for realistic demo feel
-    await new Promise((r) => setTimeout(r, 200));
-    return generatePrediction(context);
+    // Run the local heuristic pipeline — no fake latency
+    return runPipeline(context);
   }
 
   const request: PredictRequest = {
@@ -60,32 +62,6 @@ export async function getRecommendations(context: SessionContext): Promise<Sessi
   };
 
   const response = await api.predict(request);
-  return mapApiResponseToPrediction(response);
-}
-
-export async function continuePlaylist(
-  seedTrackIds: number[],
-  context?: SessionContext
-): Promise<SessionPrediction> {
-  if (USE_MOCK) {
-    await new Promise((r) => setTimeout(r, 200));
-    // In mock mode, just generate based on context or default
-    return generatePrediction(context || { mood: "chill", activity: "relax", timeOfDay: "evening", energyLevel: "medium" });
-  }
-
-  const response = await api.continuePlaylist({
-    seed_track_ids: seedTrackIds,
-    context: context
-      ? {
-          mood: context.mood,
-          activity: context.activity,
-          time_of_day: context.timeOfDay,
-          energy_level: context.energyLevel,
-        }
-      : undefined,
-    top_k: 8,
-  });
-
   return mapApiResponseToPrediction(response);
 }
 
