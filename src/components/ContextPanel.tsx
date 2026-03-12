@@ -50,6 +50,7 @@ interface ContextPanelProps {
   onNavigateProfile: () => void;
   onNavigateAuth: () => void;
   onNavigateHistory: () => void;
+  onNavigateExperiments: () => void;
   hasProfile: boolean;
   mode: "session" | "continuation";
   onModeChange: (mode: "session" | "continuation") => void;
