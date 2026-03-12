@@ -95,6 +95,7 @@ export default function ContextPanel({
   onNavigateProfile,
   onNavigateAuth,
   onNavigateHistory,
+  onNavigateExperiments,
   hasProfile,
   mode,
   onModeChange,
