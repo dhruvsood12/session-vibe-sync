@@ -6,6 +6,8 @@ SessionSense is a portfolio project that explores how **short-term session conte
 
 This repo includes both **production-style product code** and **experimental/educational ML scaffolding**. Some parts are intentionally minimal (e.g., small demo catalog + synthetic sessions) to keep iteration fast while the system design matures.
 
+**Project origin (honest note):** the initial frontend prototype/UI was created with **Lovable**, and then extended through additional engineering work in this repo (backend integration, recommendation logic refinement, demo flow, and project cleanup).
+
 ## Features
 
 ### Product (App)
@@ -55,6 +57,50 @@ The goal is to make the project **more honest, maintainable, and demo-ready**:
 ### Prerequisites
 - Node.js 18+ recommended
 - npm
+- Python 3.10+ (only needed if you run the FastAPI backend)
+
+## Quickstart (for reviewers)
+
+This runs in **demo mode** by default — recommendations work without setting up Supabase. Auth/profile/history are only available if Supabase is configured.
+
+```bash
+git clone https://github.com/dhruvsood12/session-vibe-sync.git
+cd session-vibe-sync
+npm install
+npm run dev
+```
+
+Open the URL printed by Vite (usually `http://localhost:5173`).
+
+### Optional: run the backend too (FastAPI)
+
+Terminal 1 (backend):
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install -r backend/requirements.txt
+uvicorn backend.main:app --reload --port 8000
+```
+
+Terminal 2 (frontend, using backend API instead of local mock):
+
+```bash
+VITE_USE_MOCK=false VITE_API_BASE_URL=http://localhost:8000 npm run dev
+```
+
+### Optional: enable Supabase (auth/profile/history)
+
+```bash
+cp .env.example .env
+```
+
+Then set:
+
+- `VITE_SUPABASE_URL`
+- `VITE_SUPABASE_PUBLISHABLE_KEY`
+
+Restart `npm run dev`.
 
 ### Install dependencies
 
@@ -82,9 +128,16 @@ npm test
 npm run lint
 ```
 
+## Environment variables
+
+- **Demo mode (default)**: no `.env` needed. The app runs with local heuristic recommendations.
+- **Backend mode**: set `VITE_USE_MOCK=false` and `VITE_API_BASE_URL=http://localhost:8000`.
+- **Supabase mode**: set `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` in `.env`.
+
 ## Project structure (quick map)
 
 ```
+backend/              # FastAPI backend (optional)
 src/
 ├── components/        # UI components
 ├── pages/             # Route pages
