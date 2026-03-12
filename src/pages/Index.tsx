@@ -1,11 +1,19 @@
 import { useState, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import { SessionContext, SessionPrediction } from "@/types/session";
+import { profileToTaste } from "@/types/profile";
 import { getRecommendations } from "@/services/recommendationService";
+import { useAuth } from "@/hooks/useAuth";
+import { useProfile } from "@/hooks/useProfile";
 import ContextPanel from "@/components/ContextPanel";
 import InsightsPanel from "@/components/InsightsPanel";
 import TrackTable from "@/components/TrackTable";
 
 const Index = () => {
+  const navigate = useNavigate();
+  const { user, signOut } = useAuth();
+  const { profile } = useProfile();
+
   const [context, setContext] = useState<SessionContext>({
     mood: "energetic",
     activity: "workout",
@@ -21,7 +29,8 @@ const Index = () => {
     setIsLoading(true);
     setError(null);
     try {
-      const result = await getRecommendations(context);
+      const taste = profile ? profileToTaste(profile) : undefined;
+      const result = await getRecommendations(context, taste);
       setPrediction(result);
     } catch (err) {
       console.error("Prediction failed:", err);
@@ -29,7 +38,7 @@ const Index = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [context]);
+  }, [context, profile]);
 
   return (
     <div className="flex min-h-screen bg-background">
@@ -38,6 +47,11 @@ const Index = () => {
         onContextChange={setContext}
         onGenerate={handleGenerate}
         isLoading={isLoading}
+        user={user}
+        onSignOut={signOut}
+        onNavigateProfile={() => navigate("/profile")}
+        onNavigateAuth={() => navigate("/auth")}
+        hasProfile={!!(profile && (profile.favorite_genres?.length || profile.favorite_artists?.length))}
       />
 
       <main className="flex-1 min-h-screen overflow-y-auto p-8">
@@ -68,7 +82,10 @@ const Index = () => {
             <div className="text-center space-y-3">
               <p className="text-sm text-muted-foreground">Configure session context and generate recommendations.</p>
               <p className="text-xs font-mono text-muted-foreground/50">
-                Heuristic ranker · 48 tracks · genre-affinity retrieval
+                {profile && (profile.favorite_genres?.length || profile.favorite_artists?.length)
+                  ? "personalized · heuristic-v1 · profile + session scoring"
+                  : "heuristic-v1 · session-only · set up your taste profile for personalization"
+                }
               </p>
             </div>
           </div>

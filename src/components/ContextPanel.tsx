@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { Mood, Activity, TimeOfDay, EnergyLevel, SessionContext } from "@/types/session";
-import { Zap } from "lucide-react";
+import { Zap, User as UserIcon, LogOut, LogIn } from "lucide-react";
+import { User } from "@supabase/supabase-js";
 
 interface SegmentedControlProps<T extends string> {
   label: string;
@@ -44,6 +45,11 @@ interface ContextPanelProps {
   onContextChange: (context: SessionContext) => void;
   onGenerate: () => void;
   isLoading: boolean;
+  user: User | null;
+  onSignOut: () => void;
+  onNavigateProfile: () => void;
+  onNavigateAuth: () => void;
+  hasProfile: boolean;
 }
 
 const moodOptions: { value: Mood; label: string }[] = [
@@ -75,16 +81,63 @@ const energyOptions: { value: EnergyLevel; label: string }[] = [
   { value: "high", label: "High" },
 ];
 
-export default function ContextPanel({ context, onContextChange, onGenerate, isLoading }: ContextPanelProps) {
+export default function ContextPanel({
+  context,
+  onContextChange,
+  onGenerate,
+  isLoading,
+  user,
+  onSignOut,
+  onNavigateProfile,
+  onNavigateAuth,
+  hasProfile,
+}: ContextPanelProps) {
   return (
     <aside className="w-80 shrink-0 h-screen overflow-y-auto bg-surface shadow-surface p-5 flex flex-col gap-6">
       <div className="space-y-1">
-        <div className="flex items-center gap-2">
-          <Zap className="w-4 h-4 text-accent" />
-          <h1 className="text-sm font-semibold tracking-tight text-foreground">SessionSense</h1>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Zap className="w-4 h-4 text-accent" />
+            <h1 className="text-sm font-semibold tracking-tight text-foreground">SessionSense</h1>
+          </div>
+          {user ? (
+            <div className="flex items-center gap-1">
+              <button
+                onClick={onNavigateProfile}
+                className="p-1.5 rounded-md hover:bg-surface-hover transition-colors"
+                title="Taste Profile"
+              >
+                <UserIcon className="w-3.5 h-3.5 text-muted-foreground" />
+              </button>
+              <button
+                onClick={onSignOut}
+                className="p-1.5 rounded-md hover:bg-surface-hover transition-colors"
+                title="Sign out"
+              >
+                <LogOut className="w-3.5 h-3.5 text-muted-foreground" />
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={onNavigateAuth}
+              className="flex items-center gap-1.5 px-2.5 py-1 rounded-md hover:bg-surface-hover transition-colors"
+            >
+              <LogIn className="w-3.5 h-3.5 text-muted-foreground" />
+              <span className="text-xs text-muted-foreground">Sign in</span>
+            </button>
+          )}
         </div>
         <p className="text-xs text-muted-foreground">Context-aware music recommendation</p>
       </div>
+
+      {user && !hasProfile && (
+        <button
+          onClick={onNavigateProfile}
+          className="w-full px-3 py-2 rounded-lg bg-accent/10 border border-accent/20 text-xs text-accent text-left hover:bg-accent/15 transition-colors"
+        >
+          Set up your taste profile for personalized recommendations →
+        </button>
+      )}
 
       <div className="h-px bg-border" />
 
@@ -127,7 +180,7 @@ export default function ContextPanel({ context, onContextChange, onGenerate, isL
       </motion.button>
 
       <div className="text-[10px] text-muted-foreground/50 font-mono">
-        heuristic-v1 · 48 tracks · genre-affinity retrieval
+        {hasProfile ? "personalized · heuristic-v1" : "session-only · heuristic-v1"} · {48} tracks
       </div>
     </aside>
   );
