@@ -34,31 +34,9 @@ export default function Auth() {
 
     if (error) {
       setError(error.message);
-    } else if (isSignUp) {
-      setConfirmSent(true);
     }
     setSubmitting(false);
   };
-
-  if (confirmSent) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-4">
-        <div className="w-full max-w-sm space-y-4 text-center">
-          <Mail className="w-8 h-8 text-accent mx-auto" />
-          <h2 className="text-lg font-semibold text-foreground">Check your email</h2>
-          <p className="text-sm text-muted-foreground">
-            We sent a confirmation link to <span className="text-foreground">{email}</span>
-          </p>
-          <button
-            onClick={() => { setConfirmSent(false); setIsSignUp(false); }}
-            className="text-xs text-accent hover:underline"
-          >
-            Back to sign in
-          </button>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
