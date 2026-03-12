@@ -9,6 +9,7 @@
  */
 
 import { SessionContext, SessionPrediction } from "@/types/session";
+import { UserTasteProfile } from "@/types/profile";
 import { runPipeline } from "@/lib/ranking";
 import { api, USE_MOCK, PredictRequest, PredictResponse } from "./api";
 
@@ -45,10 +46,12 @@ function mapApiResponseToPrediction(res: PredictResponse): SessionPrediction {
   };
 }
 
-export async function getRecommendations(context: SessionContext): Promise<SessionPrediction> {
+export async function getRecommendations(
+  context: SessionContext,
+  profile?: UserTasteProfile
+): Promise<SessionPrediction> {
   if (USE_MOCK) {
-    // Run the local heuristic pipeline — no fake latency
-    return runPipeline(context);
+    return runPipeline(context, 8, profile);
   }
 
   const request: PredictRequest = {
