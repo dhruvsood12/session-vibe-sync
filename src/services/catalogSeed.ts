@@ -10,7 +10,6 @@
 
 import { supabase } from "@/integrations/supabase/client";
 import { ALL_TRACKS } from "@/data/trackDatabase";
-import { isSupabaseConfigured } from "@/integrations/supabase/client";
 
 /**
  * Convert duration string "M:SS" to milliseconds.
@@ -38,10 +37,6 @@ export async function seedCatalogFromStatic(): Promise<{
   skipped: number;
   errors: string[];
 }> {
-  if (!isSupabaseConfigured || !supabase) {
-    // Demo mode: no database seeding
-    return { inserted: 0, skipped: ALL_TRACKS.length, errors: [] };
-  }
   let inserted = 0;
   let skipped = 0;
   const errors: string[] = [];
@@ -90,7 +85,6 @@ export async function seedCatalogFromStatic(): Promise<{
  * Check if catalog needs seeding.
  */
 export async function catalogNeedsSeeding(): Promise<boolean> {
-  if (!isSupabaseConfigured || !supabase) return false;
   const { count } = await supabase
     .from("catalog_tracks")
     .select("*", { count: "exact", head: true });

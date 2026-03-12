@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import { supabase, isSupabaseConfigured } from "@/integrations/supabase/client";
+import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./useAuth";
 import type { Tables } from "@/integrations/supabase/types";
 import type { SessionPrediction, SessionContext } from "@/types/session";
@@ -13,7 +13,6 @@ export function useSavedSessions() {
 
   const fetchSessions = useCallback(async () => {
     if (!user) return;
-    if (!isSupabaseConfigured || !supabase) return;
     setLoading(true);
     const { data } = await supabase
       .from("saved_sessions")
@@ -33,9 +32,6 @@ export function useSavedSessions() {
     mode?: string,
   ) => {
     if (!user) return { error: new Error("Not authenticated") };
-    if (!isSupabaseConfigured || !supabase) {
-      return { error: new Error("Saving is disabled (Supabase is not configured)") };
-    }
 
     const { error } = await supabase.from("saved_sessions").insert({
       user_id: user.id,
@@ -60,7 +56,6 @@ export function useSavedSessions() {
 
   const deleteSession = useCallback(async (id: string) => {
     if (!user) return;
-    if (!isSupabaseConfigured || !supabase) return;
     await supabase.from("saved_sessions").delete().eq("id", id);
     setSessions((prev) => prev.filter((s) => s.id !== id));
   }, [user]);

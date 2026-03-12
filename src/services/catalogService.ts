@@ -13,8 +13,7 @@
  * for discovery of tracks not yet in the catalog.
  */
 
-import { supabase, isSupabaseConfigured } from "@/integrations/supabase/client";
-import { ALL_TRACKS } from "@/data/trackDatabase";
+import { supabase } from "@/integrations/supabase/client";
 
 export interface CatalogTrack {
   id: string;
@@ -44,38 +43,6 @@ export interface CatalogSearchResult {
   total: number;
 }
 
-function searchSeedCatalog(query: string, limit: number): CatalogSearchResult {
-  const q = query.toLowerCase();
-  const matched = ALL_TRACKS.filter((t) => {
-    const haystack = `${t.title} ${t.artist} ${t.album} ${t.genre}`.toLowerCase();
-    return haystack.includes(q);
-  })
-    .slice(0, limit)
-    .map((t) => ({
-      id: `seed_${t.id}`,
-      spotify_track_id: null,
-      title: t.title,
-      artist_name: t.artist,
-      album_name: t.album,
-      album_image_url: null,
-      duration_ms: null,
-      popularity: null,
-      preview_url: null,
-      spotify_url: null,
-      genre_tags: [t.genre],
-      bpm: t.bpm,
-      energy: t.energy,
-      danceability: t.danceability,
-      valence: t.valence,
-      acousticness: null,
-      instrumentalness: null,
-      source: "seed",
-      enriched: true,
-    }));
-
-  return { tracks: matched, source: "seed", total: matched.length };
-}
-
 /**
  * Search the local catalog database.
  * Uses ilike for fuzzy matching on title and artist_name.
@@ -86,9 +53,6 @@ export async function searchCatalog(
 ): Promise<CatalogSearchResult> {
   if (!query || query.length < 2) {
     return { tracks: [], source: "local", total: 0 };
-  }
-  if (!isSupabaseConfigured || !supabase) {
-    return searchSeedCatalog(query, limit);
   }
 
   const pattern = `%${query}%`;
@@ -120,9 +84,6 @@ export async function searchSpotify(
   query: string,
   limit: number = 20
 ): Promise<CatalogSearchResult> {
-  if (!isSupabaseConfigured || !supabase) {
-    return { tracks: [], source: "spotify", total: 0 };
-  }
   try {
     const { data, error } = await supabase.functions.invoke("spotify-catalog", {
       body: { action: "search", query, type: "track", limit },
@@ -201,11 +162,6 @@ export async function getCatalogForRecommendation(
   options: { enrichedOnly?: boolean; limit?: number } = {}
 ): Promise<CatalogTrack[]> {
   const { enrichedOnly = false, limit = 500 } = options;
-  if (!isSupabaseConfigured || !supabase) {
-    // In demo mode, the recommendation pipeline uses src/data/trackDatabase.ts directly.
-    // Returning [] here avoids hard dependency on Supabase catalog tables.
-    return [];
-  }
 
   let query = supabase
     .from("catalog_tracks")
@@ -234,7 +190,6 @@ export async function getCatalogForRecommendation(
  * Get a single track by ID.
  */
 export async function getTrackById(id: string): Promise<CatalogTrack | null> {
-  if (!isSupabaseConfigured || !supabase) return null;
   const { data, error } = await supabase
     .from("catalog_tracks")
     .select("*")
@@ -252,9 +207,6 @@ export async function checkSpotifyStatus(): Promise<{
   configured: boolean;
   capabilities: string[];
 }> {
-  if (!isSupabaseConfigured || !supabase) {
-    return { configured: false, capabilities: ["local_catalog_only"] };
-  }
   try {
     const { data, error } = await supabase.functions.invoke("spotify-catalog", {
       body: { action: "health" },
@@ -281,13 +233,6 @@ export async function getCatalogStats(): Promise<{
   enrichedTracks: number;
   sources: Record<string, number>;
 }> {
-  if (!isSupabaseConfigured || !supabase) {
-    return {
-      totalTracks: ALL_TRACKS.length,
-      enrichedTracks: ALL_TRACKS.length,
-      sources: { seed: ALL_TRACKS.length },
-    };
-  }
   const { data: allTracks } = await supabase
     .from("catalog_tracks")
     .select("source, enriched");
