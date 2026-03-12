@@ -10,6 +10,7 @@ export interface Track {
   genre: string;
   danceability: number;
   valence: number;
+  shapValues?: ShapValue[];
 }
 
 export interface FeatureWeight {

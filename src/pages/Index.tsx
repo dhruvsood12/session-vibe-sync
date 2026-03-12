@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect, useRef } from "react";
 import { SessionContext, SessionPrediction } from "@/types/session";
-import { generatePrediction } from "@/data/mockData";
+import { getRecommendations } from "@/services/recommendationService";
 import ContextPanel from "@/components/ContextPanel";
 import InsightsPanel from "@/components/InsightsPanel";
 import TrackTable from "@/components/TrackTable";
@@ -24,7 +24,6 @@ const Index = () => {
     setLoadingStep(0);
     setPrediction(null);
 
-    // Clear any previous interval
     if (intervalRef.current) clearInterval(intervalRef.current);
 
     let step = 0;
@@ -32,9 +31,16 @@ const Index = () => {
       step++;
       if (step >= 4) {
         if (intervalRef.current) clearInterval(intervalRef.current);
-        const result = generatePrediction(context);
-        setPrediction(result);
-        setIsLoading(false);
+        // Call the service layer instead of mock data directly
+        getRecommendations(context)
+          .then((result) => {
+            setPrediction(result);
+            setIsLoading(false);
+          })
+          .catch((err) => {
+            console.error("Prediction failed:", err);
+            setIsLoading(false);
+          });
       } else {
         setLoadingStep(step);
       }
@@ -76,7 +82,11 @@ const Index = () => {
           <div className="h-full flex items-center justify-center min-h-[60vh]">
             <div className="text-center space-y-3">
               <p className="text-sm text-muted-foreground">Configure session context and generate recommendations.</p>
-              <p className="text-xs font-mono text-muted-foreground/50">LightGBM ranking model · Spotify MPD features</p>
+              <p className="text-xs font-mono text-muted-foreground/50">
+                {import.meta.env.VITE_USE_MOCK !== "false"
+                  ? "Mock mode · LightGBM ranking model · Spotify MPD features"
+                  : `Connected to ${import.meta.env.VITE_API_BASE_URL || "http://localhost:8000"}`}
+              </p>
             </div>
           </div>
         )}
