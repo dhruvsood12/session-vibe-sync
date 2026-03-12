@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase, isSupabaseConfigured } from "@/integrations/supabase/client";
 import { useAuth } from "./useAuth";
 import type { Tables, TablesUpdate } from "@/integrations/supabase/types";
 
@@ -14,6 +14,12 @@ export function useProfile() {
 
   const fetchProfile = useCallback(async () => {
     if (!user) {
+      setProfile(null);
+      setLoading(false);
+      return;
+    }
+    if (!isSupabaseConfigured || !supabase) {
+      setError("Profiles are disabled (Supabase is not configured)");
       setProfile(null);
       setLoading(false);
       return;
@@ -39,6 +45,9 @@ export function useProfile() {
 
   const updateProfile = useCallback(async (updates: ProfileUpdate) => {
     if (!user) return { error: new Error("Not authenticated") };
+    if (!isSupabaseConfigured || !supabase) {
+      return { error: new Error("Profiles are disabled (Supabase is not configured)") };
+    }
 
     const { data, error } = await supabase
       .from("profiles")
