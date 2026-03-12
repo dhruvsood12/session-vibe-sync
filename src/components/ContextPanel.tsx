@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { Mood, Activity, TimeOfDay, EnergyLevel, SessionContext } from "@/types/session";
-import { Zap, User as UserIcon, LogOut, LogIn, Clock } from "lucide-react";
+import { Zap, User as UserIcon, LogOut, LogIn, Clock, FlaskConical } from "lucide-react";
 import { User } from "@supabase/supabase-js";
 
 interface SegmentedControlProps<T extends string> {
