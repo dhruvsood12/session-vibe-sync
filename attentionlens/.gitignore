@@ -1,0 +1,50 @@
+# Dependencies
+node_modules
+.venv
+venv
+__pycache__
+*.pyc
+.pytest_cache
+.mypy_cache
+
+# Build / dist
+.next
+out
+dist
+dist-ssr
+*.egg-info
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# IDE / OS
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.sw?
+
+# ML artifacts
+ml/saved_models/*
+!ml/saved_models/.gitkeep
+ml/data/raw/*
+ml/data/processed/*
+!ml/data/raw/.gitkeep
+!ml/data/processed/.gitkeep
+*.joblib
+*.pkl
+*.pt
+*.pth
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+
+# SQLite (optional; uncomment if you want to ignore DB)
+# *.db
+# *.sqlite3

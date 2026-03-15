@@ -1,0 +1,26 @@
+# AttentionLens — local dev stack (optional)
+# Run backend + frontend separately for dev; use this for a single-command preview later.
+
+version: "3.8"
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    env_file: .env
+    volumes:
+      - ./backend:/app
+
+  # Frontend typically run via npm run dev during development
+  # frontend:
+  #   build:
+  #     context: ./frontend
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - "3000:3000"
+  #   env_file: .env
+  #   environment:
+  #     NEXT_PUBLIC_API_URL: http://localhost:8000
