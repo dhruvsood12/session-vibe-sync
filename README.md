@@ -153,4 +153,4 @@ src/
 ## What’s implemented vs. scaffolded (honest status)
 
 - **Implemented**: heuristic session ranker, continuation by content similarity, baseline ML models, offline metrics on synthetic/demo data, app UI + auth/profile flows.
-- **In progress / scaffolded**: transformer training on large-scale real data, Spotify API integration, and real benchmark reporting on standard datasets.
+- **In progress / scaffolded**: transformer training on large-scale real data, Spotify API integration, and real benchmark reporting on standard datasets, Adding security tests, and proper architecture.
